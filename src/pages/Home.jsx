@@ -1,15 +1,35 @@
+import ProductCard from "../components/ProductCard";
+import { getProducts } from "../data/products";
+
 export default function Home() {
+  const products = getProducts();
+
   return (
-    <div className="page">
-      <div className="home-hero">
-        <h1 className="home-title">Welcome to ShopHub</h1>
-        <p className="home-subtitle">
-          Discover amazing products at great prices
+    <div className="rs-page">
+      {/* Hero */}
+      <div className="hero">
+        <p className="hero-subtitle">Curated Collection</p>
+        <h1 className="hero-title">
+          Shop with<br />
+          <em>intention</em>
+        </h1>
+        <p className="hero-desc">
+          Handpicked products chosen for quality, beauty, and everyday joy.
         </p>
+        <a href="#products" className="btn btn-primary">
+          Explore Now ↓
+        </a>
       </div>
-      <div className="container">
-        <h2 className="page-title">Our Products</h2>
-        <p>Products coming soon...</p>
+
+      {/* Products */}
+      <div className="section" id="products">
+        <p className="section-label">Our Collection</p>
+        <h2 className="section-title">Featured Products</h2>
+        <div className="products-grid">
+          {products.map((product) => (
+            <ProductCard product={product} key={product.id} />
+          ))}
+        </div>
       </div>
     </div>
   );
