@@ -3,10 +3,11 @@ import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import Checkout from "./pages/Checkout";
 import Navbar from "./components/Navbar";
+import ProductDetails from "./pages/ProductDetails";
+import Orders from "./pages/Orders";
 
 import "./App.css";
 import AuthProvider from "./context/AuthContext";
-import ProductDetails from "./pages/ProductDetails";
 import CartProvider from "./context/CartContext";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/orders" element={<Orders />} />
           </Routes>
         </div>
       </CartProvider>

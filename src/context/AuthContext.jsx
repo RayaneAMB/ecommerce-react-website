@@ -1,60 +1,64 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(
-    localStorage.getItem("currentUserEmail")
-      ? { email: localStorage.getItem("currentUserEmail") }
-      : null
-  );
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-  function signUp(email, password) {
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-
-    if (users.find((u) => u.email === email)) {
-      return { success: false, error: "Email already exists" };
+  const signUp = async (email, password) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+      
+      if (!response.ok) return { success: false, error: data.error };
+      
+      setUser(data.user);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: "Network error" };
     }
-    const newUser = { email, password };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("currentUserEmail", email);
+  };
 
-    setUser({ email });
-
-    return { success: true };
-  }
-
-  function login(email, password) {
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const user = users.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (!user) {
-      return { success: false, error: "Invalid email or password" };
+  const login = async (email, password) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+      
+      if (!response.ok) return { success: false, error: data.error };
+      
+      setUser(data.user);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: "Network error" };
     }
+  };
 
-    localStorage.setItem("currentUserEmail", email);
-    setUser({ email });
-
-    return { success: true };
-  }
-
-  function logout() {
-    localStorage.removeItem("currentUserEmail");
+  const logout = () => {
     setUser(null);
-  }
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  };
 
   return (
-    <AuthContext.Provider value={{ signUp, user, logout, login }}>
+    <AuthContext.Provider value={{ user, signUp, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  return context;
-}
+export const useAuth = () => useContext(AuthContext);

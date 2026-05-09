@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getProductById } from "../data/products";
 import { useCart } from "../context/CartContext";
 
 export default function ProductDetails() {
@@ -10,18 +9,23 @@ export default function ProductDetails() {
   const { addToCart, cartItems } = useCart();
 
   useEffect(() => {
-    const foundProduct = getProductById(id);
-    if (!foundProduct) {
-      navigate("/");
-      return;
-    }
-    setProduct(foundProduct);
-  }, [id]);
+    // Fetch single item from backend
+    fetch(`http://localhost:5000/api/products/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data) {
+          navigate("/"); // Go home if product doesn't exist
+          return;
+        }
+        setProduct(data);
+      })
+      .catch((err) => console.error(err));
+  }, [id, navigate]);
 
   if (!product) {
     return (
       <div className="rs-page">
-        <div className="detail-loading">Loading…</div>
+        <div className="detail-loading">Loading from Database…</div>
       </div>
     );
   }
@@ -31,12 +35,10 @@ export default function ProductDetails() {
   return (
     <div className="rs-page">
       <div className="detail-layout">
-        {/* Image */}
         <div className="detail-img-wrap">
           <img src={product.image} alt={product.name} className="detail-img" />
         </div>
 
-        {/* Content */}
         <div className="detail-content">
           <button className="detail-back" onClick={() => navigate(-1)}>
             ← Back to shop
