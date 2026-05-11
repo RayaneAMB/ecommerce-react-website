@@ -7,8 +7,9 @@ import ProductDetails from "./pages/ProductDetails";
 import Orders from "./pages/Orders";
 
 import "./App.css";
-import AuthProvider from "./context/AuthContext";
-import CartProvider from "./context/CartContext";
+// 👇 Notice the curly braces added here! 👇
+import { AuthProvider } from "./context/AuthContext";
+import CartProvider  from "./context/CartContext";
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Auth />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/orders" element={<Orders />} />

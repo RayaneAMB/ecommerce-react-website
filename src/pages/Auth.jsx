@@ -15,21 +15,23 @@ export default function Auth() {
     formState: { errors },
   } = useForm();
 
-  function onSubmit(data) {
+ async function onSubmit(data) {
     setError(null);
     let result;
     if (mode === "signup") {
-      result = signUp(data.email, data.password);
+    
+      result = await signUp(data.email, data.password);
     } else {
-      result = login(data.email, data.password);
+
+      result = await login(data.email, data.password);
     }
+    
     if (result.success) {
       navigate("/");
     } else {
       setError(result.error);
     }
   }
-
   return (
     <div className="rs-page">
       <div className="auth-wrap">

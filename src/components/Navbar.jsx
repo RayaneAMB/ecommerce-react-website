@@ -33,7 +33,7 @@ export default function Navbar() {
           <Link to="/login" className="nav-link">Login/Signup</Link>
         )}
 
-        <Link to="/cart" className="nav-cart">
+        <Link to="/checkout" className="nav-cart">
           🛒
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </Link>

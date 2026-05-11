@@ -1,5 +1,8 @@
 import { useCart } from "../context/CartContext";
 
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 export default function Checkout() {
   const {
     getCartItemsWithProducts,
@@ -9,12 +12,46 @@ export default function Checkout() {
     clearCart,
   } = useCart();
 
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const cartItems = getCartItemsWithProducts();
   const total = getCartTotal();
 
-  function placeOrder() {
-    alert("Order placed! Thank you 🎉");
-    clearCart();
+  async function placeOrder() {
+    if (!user) {
+      alert("You must be logged in to place an order.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/orders/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userEmail: user.email,
+          items: cartItems.map((item) => ({
+            productId: item.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+          })),
+          totalAmount: total,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Order placed successfully! 🎉");
+        clearCart();
+        navigate("/orders"); 
+      } else {
+        alert("Failed to place order.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Network error.");
+    }
   }
 
   if (cartItems.length === 0) {
